@@ -31,145 +31,541 @@ import pt.unl.fct.iadi.bookstore.controller.dto.ReviewResponse
 import pt.unl.fct.iadi.bookstore.controller.dto.UpdateBookRequest
 import pt.unl.fct.iadi.bookstore.controller.dto.UpdateReviewRequest
 
-@Tag(name = "Bookstore", description = "Book and review management API")
+@Tag(
+    name = "Bookstore",
+    description = "Book and review management API",
+)
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface BookstoreAPI {
 
-    @Operation(summary = "List books", description = "Returns the full book catalog. Returns an empty array when no books exist.")
-    @ApiResponse(responseCode = "200", description = "Books returned", content = [Content(array = ArraySchema(schema = Schema(implementation = BookResponse::class)))])
+    @Operation(
+        summary = "List books",
+        description = "Returns the full book catalog. Returns an empty array when no books exist.",
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "Books returned",
+        content = [
+            Content(
+                array = ArraySchema(
+                    schema = Schema(implementation = BookResponse::class),
+                ),
+            ),
+        ],
+    )
     @GetMapping("/books")
     fun listBooks(): ResponseEntity<List<BookResponse>>
 
-    @Operation(summary = "Create a book", description = "Registers a new book in the catalog.")
-    @ApiResponses(
-        ApiResponse(responseCode = "201", description = "Book created", content = [Content(schema = Schema(implementation = BookResponse::class))]),
-        ApiResponse(responseCode = "400", description = "Validation error", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-        ApiResponse(responseCode = "409", description = "Book already exists", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    @Operation(
+        summary = "Create a book",
+        description = "Registers a new book in the catalog.",
     )
-    @PostMapping("/books", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "201",
+                description = "Book created",
+                content = [
+                    Content(
+                        schema = Schema(implementation = BookResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validation error",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Book already exists",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @PostMapping(
+        "/books",
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+    )
     fun createBook(
-        @RequestBody(description = "Book to create", required = true, content = [Content(schema = Schema(implementation = CreateBookRequest::class))])
-        @Valid @SpringRequestBody request: CreateBookRequest,
+        @RequestBody(
+            description = "Book to create",
+            required = true,
+            content = [
+                Content(
+                    schema = Schema(implementation = CreateBookRequest::class),
+                ),
+            ],
+        )
+        @Valid
+        @SpringRequestBody
+        request: CreateBookRequest,
     ): ResponseEntity<BookResponse>
 
-    @Operation(summary = "Get a single book", description = "Returns a single book by ISBN. Error messages honor Accept-Language for pt and en.")
+    @Operation(
+        summary = "Get a single book",
+        description = "Returns a single book by ISBN. Error messages honor Accept-Language for pt and en.",
+    )
     @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Book returned", content = [Content(schema = Schema(implementation = BookResponse::class))]),
-        ApiResponse(responseCode = "404", description = "Book not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Book returned",
+                content = [
+                    Content(
+                        schema = Schema(implementation = BookResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Book not found",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
     )
     @GetMapping("/books/{isbn}")
     fun getBook(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
-        @RequestHeader(name = "Accept-Language", required = false) acceptLanguage: String?,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
+        @RequestHeader(
+            name = "Accept-Language",
+            required = false,
+        )
+        acceptLanguage: String?,
     ): ResponseEntity<BookResponse>
 
-    @Operation(summary = "Replace a book", description = "Fully replaces a book. Creates it if it does not already exist.")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Book replaced", content = [Content(schema = Schema(implementation = BookResponse::class))]),
-        ApiResponse(responseCode = "201", description = "Book created through upsert", content = [Content(schema = Schema(implementation = BookResponse::class))]),
-        ApiResponse(responseCode = "400", description = "Validation error", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    @Operation(
+        summary = "Replace a book",
+        description = "Fully replaces a book. Creates it if it does not already exist.",
     )
-    @PutMapping("/books/{isbn}", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Book replaced",
+                content = [
+                    Content(
+                        schema = Schema(implementation = BookResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "201",
+                description = "Book created through upsert",
+                content = [
+                    Content(
+                        schema = Schema(implementation = BookResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validation error",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @PutMapping(
+        "/books/{isbn}",
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+    )
     fun replaceBook(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
-        @RequestBody(description = "Full replacement representation", required = true, content = [Content(schema = Schema(implementation = ReplaceBookRequest::class))])
-        @Valid @SpringRequestBody request: ReplaceBookRequest,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
+        @RequestBody(
+            description = "Full replacement representation",
+            required = true,
+            content = [
+                Content(
+                    schema = Schema(implementation = ReplaceBookRequest::class),
+                ),
+            ],
+        )
+        @Valid
+        @SpringRequestBody
+        request: ReplaceBookRequest,
     ): ResponseEntity<BookResponse>
 
-    @Operation(summary = "Partially update a book", description = "Updates only the provided book fields.")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Book updated", content = [Content(schema = Schema(implementation = BookResponse::class))]),
-        ApiResponse(responseCode = "400", description = "Validation error", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-        ApiResponse(responseCode = "404", description = "Book not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    @Operation(
+        summary = "Partially update a book",
+        description = "Updates only the provided book fields.",
     )
-    @PatchMapping("/books/{isbn}", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Book updated",
+                content = [
+                    Content(
+                        schema = Schema(implementation = BookResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validation error",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Book not found",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @PatchMapping(
+        "/books/{isbn}",
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+    )
     fun updateBook(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
-        @RequestBody(description = "Partial update representation", required = true, content = [Content(schema = Schema(implementation = UpdateBookRequest::class))])
-        @Valid @SpringRequestBody request: UpdateBookRequest,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
+        @RequestBody(
+            description = "Partial update representation",
+            required = true,
+            content = [
+                Content(
+                    schema = Schema(implementation = UpdateBookRequest::class),
+                ),
+            ],
+        )
+        @Valid
+        @SpringRequestBody
+        request: UpdateBookRequest,
     ): ResponseEntity<BookResponse>
 
-    @Operation(summary = "Delete a book", description = "Deletes a book and all reviews belonging to it.")
+    @Operation(
+        summary = "Delete a book",
+        description = "Deletes a book and all reviews belonging to it.",
+    )
     @ApiResponses(
-        ApiResponse(responseCode = "204", description = "Book deleted"),
-        ApiResponse(responseCode = "404", description = "Book not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "Book deleted",
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Book not found",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
     )
     @DeleteMapping("/books/{isbn}")
     fun deleteBook(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
     ): ResponseEntity<Void>
 
-    @Operation(summary = "List reviews for a book", description = "Returns all reviews for the given book.")
+    @Operation(
+        summary = "List reviews for a book",
+        description = "Returns all reviews for the given book.",
+    )
     @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Reviews returned", content = [Content(array = ArraySchema(schema = Schema(implementation = ReviewResponse::class)))]),
-        ApiResponse(responseCode = "404", description = "Book not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Reviews returned",
+                content = [
+                    Content(
+                        array = ArraySchema(
+                            schema = Schema(implementation = ReviewResponse::class),
+                        ),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Book not found",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
     )
     @GetMapping("/books/{isbn}/reviews")
     fun listReviews(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
     ): ResponseEntity<List<ReviewResponse>>
 
-    @Operation(summary = "Create a review", description = "Creates a review for the given book.")
-    @ApiResponses(
-        ApiResponse(responseCode = "201", description = "Review created", content = [Content(schema = Schema(implementation = ReviewResponse::class))]),
-        ApiResponse(responseCode = "400", description = "Validation error", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-        ApiResponse(responseCode = "404", description = "Book not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    @Operation(
+        summary = "Create a review",
+        description = "Creates a review for the given book.",
     )
-    @PostMapping("/books/{isbn}/reviews", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "201",
+                description = "Review created",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ReviewResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validation error",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Book not found",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @PostMapping(
+        "/books/{isbn}/reviews",
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+    )
     fun createReview(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
-        @RequestBody(description = "Review to create", required = true, content = [Content(schema = Schema(implementation = CreateReviewRequest::class))])
-        @Valid @SpringRequestBody request: CreateReviewRequest,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
+        @RequestBody(
+            description = "Review to create",
+            required = true,
+            content = [
+                Content(
+                    schema = Schema(implementation = CreateReviewRequest::class),
+                ),
+            ],
+        )
+        @Valid
+        @SpringRequestBody
+        request: CreateReviewRequest,
     ): ResponseEntity<ReviewResponse>
 
-    @Operation(summary = "Replace a review", description = "Fully replaces an existing review.")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Review replaced", content = [Content(schema = Schema(implementation = ReviewResponse::class))]),
-        ApiResponse(responseCode = "400", description = "Validation error", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-        ApiResponse(responseCode = "404", description = "Book or review not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    @Operation(
+        summary = "Replace a review",
+        description = "Fully replaces an existing review.",
     )
-    @PutMapping("/books/{isbn}/reviews/{reviewId}", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Review replaced",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ReviewResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validation error",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Book or review not found",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @PutMapping(
+        "/books/{isbn}/reviews/{reviewId}",
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+    )
     fun replaceReview(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
-        @Parameter(description = "Identifier of the review", example = "1")
-        @PathVariable reviewId: Long,
-        @RequestBody(description = "Full replacement representation", required = true, content = [Content(schema = Schema(implementation = ReplaceReviewRequest::class))])
-        @Valid @SpringRequestBody request: ReplaceReviewRequest,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
+        @Parameter(
+            description = "Identifier of the review",
+            example = "1",
+        )
+        @PathVariable
+        reviewId: Long,
+        @RequestBody(
+            description = "Full replacement representation",
+            required = true,
+            content = [
+                Content(
+                    schema = Schema(implementation = ReplaceReviewRequest::class),
+                ),
+            ],
+        )
+        @Valid
+        @SpringRequestBody
+        request: ReplaceReviewRequest,
     ): ResponseEntity<ReviewResponse>
 
-    @Operation(summary = "Partially update a review", description = "Updates only the provided review fields.")
-    @ApiResponses(
-        ApiResponse(responseCode = "200", description = "Review updated", content = [Content(schema = Schema(implementation = ReviewResponse::class))]),
-        ApiResponse(responseCode = "400", description = "Validation error", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
-        ApiResponse(responseCode = "404", description = "Book or review not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+    @Operation(
+        summary = "Partially update a review",
+        description = "Updates only the provided review fields.",
     )
-    @PatchMapping("/books/{isbn}/reviews/{reviewId}", consumes = [MediaType.APPLICATION_JSON_VALUE])
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Review updated",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ReviewResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Validation error",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Book or review not found",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
+    )
+    @PatchMapping(
+        "/books/{isbn}/reviews/{reviewId}",
+        consumes = [MediaType.APPLICATION_JSON_VALUE],
+    )
     fun updateReview(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
-        @Parameter(description = "Identifier of the review", example = "1")
-        @PathVariable reviewId: Long,
-        @RequestBody(description = "Partial update representation", required = true, content = [Content(schema = Schema(implementation = UpdateReviewRequest::class))])
-        @Valid @SpringRequestBody request: UpdateReviewRequest,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
+        @Parameter(
+            description = "Identifier of the review",
+            example = "1",
+        )
+        @PathVariable
+        reviewId: Long,
+        @RequestBody(
+            description = "Partial update representation",
+            required = true,
+            content = [
+                Content(
+                    schema = Schema(implementation = UpdateReviewRequest::class),
+                ),
+            ],
+        )
+        @Valid
+        @SpringRequestBody
+        request: UpdateReviewRequest,
     ): ResponseEntity<ReviewResponse>
 
-    @Operation(summary = "Delete a review", description = "Deletes an existing review from a book.")
+    @Operation(
+        summary = "Delete a review",
+        description = "Deletes an existing review from a book.",
+    )
     @ApiResponses(
-        ApiResponse(responseCode = "204", description = "Review deleted"),
-        ApiResponse(responseCode = "404", description = "Book or review not found", content = [Content(schema = Schema(implementation = ErrorResponse::class))]),
+        value = [
+            ApiResponse(
+                responseCode = "204",
+                description = "Review deleted",
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "Book or review not found",
+                content = [
+                    Content(
+                        schema = Schema(implementation = ErrorResponse::class),
+                    ),
+                ],
+            ),
+        ],
     )
     @DeleteMapping("/books/{isbn}/reviews/{reviewId}")
     fun deleteReview(
-        @Parameter(description = "ISBN of the book", example = "9780134685991")
-        @PathVariable isbn: String,
-        @Parameter(description = "Identifier of the review", example = "1")
-        @PathVariable reviewId: Long,
+        @Parameter(
+            description = "ISBN of the book",
+            example = "9780134685991",
+        )
+        @PathVariable
+        isbn: String,
+        @Parameter(
+            description = "Identifier of the review",
+            example = "1",
+        )
+        @PathVariable
+        reviewId: Long,
     ): ResponseEntity<Void>
 }
