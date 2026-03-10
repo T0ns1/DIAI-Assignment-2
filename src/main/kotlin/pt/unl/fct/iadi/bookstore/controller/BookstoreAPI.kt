@@ -65,11 +65,6 @@ interface BookstoreAPI {
             ApiResponse(
                 responseCode = "201",
                 description = "Book created",
-                content = [
-                    Content(
-                        schema = Schema(implementation = BookResponse::class),
-                    ),
-                ],
             ),
             ApiResponse(
                 responseCode = "400",
@@ -108,7 +103,7 @@ interface BookstoreAPI {
         @Valid
         @SpringRequestBody
         request: CreateBookRequest,
-    ): ResponseEntity<BookResponse>
+    ): ResponseEntity<Void>
 
     @Operation(
         summary = "Get a single book",
