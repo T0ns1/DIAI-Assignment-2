@@ -1,0 +1,192 @@
+@host = http://localhost:8080
+@isbn = 9780134685991
+@missingIsbn = 0000000000000
+@reviewId = 1
+
+### US1 - list books (empty or populated)
+GET {{host}}/books
+Accept: application/json
+
+### US2 - create book (success)
+POST {{host}}/books
+Content-Type: application/json
+Accept: application/json
+
+{
+  "isbn": "{{isbn}}",
+  "title": "Effective Java",
+  "author": "Joshua Bloch",
+  "price": 49.99,
+  "image": "https://example.com/covers/effective-java.jpg"
+}
+
+### US2 - create book (conflict)
+POST {{host}}/books
+Content-Type: application/json
+Accept: application/json
+
+{
+  "isbn": "{{isbn}}",
+  "title": "Effective Java",
+  "author": "Joshua Bloch",
+  "price": 49.99,
+  "image": "https://example.com/covers/effective-java.jpg"
+}
+
+### US2 - create book (validation error)
+POST {{host}}/books
+Content-Type: application/json
+Accept: application/json
+
+{
+  "isbn": "",
+  "title": "",
+  "author": "",
+  "price": 0,
+  "image": "not-a-url"
+}
+
+### US3 - get single book (success)
+GET {{host}}/books/{{isbn}}
+Accept: application/json
+Accept-Language: en
+
+### US3 - get single book (not found, Portuguese)
+GET {{host}}/books/{{missingIsbn}}
+Accept: application/json
+Accept-Language: pt
+
+### US4 - replace book (upsert create)
+PUT {{host}}/books/9780321356680
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Effective C++",
+  "author": "Scott Meyers",
+  "price": 39.90,
+  "image": "https://example.com/covers/effective-cpp.jpg"
+}
+
+### US4 - replace book (replace existing)
+PUT {{host}}/books/{{isbn}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Effective Java, 3rd Edition",
+  "author": "Joshua Bloch",
+  "price": 54.99,
+  "image": "https://example.com/covers/effective-java-3e.jpg"
+}
+
+### US5 - partially update book (success)
+PATCH {{host}}/books/{{isbn}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "price": 44.99,
+  "image": "https://example.com/covers/effective-java-discount.jpg"
+}
+
+### US5 - partially update book (not found)
+PATCH {{host}}/books/{{missingIsbn}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Ghost Book"
+}
+
+### US6 - delete book (not found)
+DELETE {{host}}/books/{{missingIsbn}}
+Accept: application/json
+
+### US7 - list reviews for a book (empty)
+GET {{host}}/books/{{isbn}}/reviews
+Accept: application/json
+
+### US7 - list reviews for a missing book
+GET {{host}}/books/{{missingIsbn}}/reviews
+Accept: application/json
+
+### US8 - create review (success)
+POST {{host}}/books/{{isbn}}/reviews
+Content-Type: application/json
+Accept: application/json
+
+{
+  "rating": 5,
+  "comment": "Excellent reference book."
+}
+
+### US8 - create review (validation error)
+POST {{host}}/books/{{isbn}}/reviews
+Content-Type: application/json
+Accept: application/json
+
+{
+  "rating": 7,
+  "comment": "Too high"
+}
+
+### US8 - create review (missing book)
+POST {{host}}/books/{{missingIsbn}}/reviews
+Content-Type: application/json
+Accept: application/json
+
+{
+  "rating": 4,
+  "comment": "Cannot be saved"
+}
+
+### US9 - replace review (success)
+PUT {{host}}/books/{{isbn}}/reviews/{{reviewId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "rating": 4,
+  "comment": "Still very good after a second read."
+}
+
+### US9 - replace review (review not found)
+PUT {{host}}/books/{{isbn}}/reviews/999
+Content-Type: application/json
+Accept: application/json
+
+{
+  "rating": 3,
+  "comment": "Missing review"
+}
+
+### US10 - partially update review (success)
+PATCH {{host}}/books/{{isbn}}/reviews/{{reviewId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "comment": "Updated only the comment."
+}
+
+### US10 - partially update review (validation error)
+PATCH {{host}}/books/{{isbn}}/reviews/{{reviewId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "rating": 0
+}
+
+### US11 - delete review (success)
+DELETE {{host}}/books/{{isbn}}/reviews/{{reviewId}}
+Accept: application/json
+
+### US11 - delete review (review not found)
+DELETE {{host}}/books/{{isbn}}/reviews/{{reviewId}}
+Accept: application/json
+
+### US6 - delete book (success, should also delete all reviews)
+DELETE {{host}}/books/{{isbn}}
+Accept: application/json
