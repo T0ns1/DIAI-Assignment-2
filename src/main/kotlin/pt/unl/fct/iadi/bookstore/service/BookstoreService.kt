@@ -1,6 +1,8 @@
 package pt.unl.fct.iadi.bookstore.service
 
 import jakarta.validation.Validator
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import pt.unl.fct.iadi.bookstore.controller.dto.CreateBookRequest
 import pt.unl.fct.iadi.bookstore.controller.dto.CreateReviewRequest
@@ -71,6 +73,7 @@ class BookstoreService(
         return updated
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     fun deleteBook(isbn: String) {
         if (books.remove(isbn) == null) {
             throw BookNotFoundException(isbn)
@@ -89,6 +92,7 @@ class BookstoreService(
             id = reviewIdSequence.getAndIncrement(),
             rating = request.rating,
             comment = request.comment,
+            author = currentUsername(),
         )
         validate(review)
         val reviewMap = reviewsByBook.computeIfAbsent(isbn) { ConcurrentHashMap() }
@@ -96,22 +100,23 @@ class BookstoreService(
         return review
     }
 
+    @PreAuthorize("@reviewAuthorizationService.isReviewAuthor(#isbn, #reviewId, authentication)")
     fun replaceReview(isbn: String, reviewId: Long, request: ReplaceReviewRequest): Review {
         ensureBookExists(isbn)
         val reviewMap = reviewsByBook[isbn] ?: throw ReviewNotFoundException(isbn, reviewId)
-        if (!reviewMap.containsKey(reviewId)) {
-            throw ReviewNotFoundException(isbn, reviewId)
-        }
+        val current = reviewMap[reviewId] ?: throw ReviewNotFoundException(isbn, reviewId)
         val updated = Review(
             id = reviewId,
             rating = request.rating,
             comment = request.comment,
+            author = current.author,
         )
         validate(updated)
         reviewMap[reviewId] = updated
         return updated
     }
 
+    @PreAuthorize("@reviewAuthorizationService.isReviewAuthor(#isbn, #reviewId, authentication)")
     fun updateReview(isbn: String, reviewId: Long, request: UpdateReviewRequest): Review {
         ensureBookExists(isbn)
         val reviewMap = reviewsByBook[isbn] ?: throw ReviewNotFoundException(isbn, reviewId)
@@ -125,6 +130,7 @@ class BookstoreService(
         return updated
     }
 
+    @PreAuthorize("@reviewAuthorizationService.isReviewAuthorOrAdmin(#isbn, #reviewId, authentication)")
     fun deleteReview(isbn: String, reviewId: Long) {
         ensureBookExists(isbn)
         val reviewMap = reviewsByBook[isbn] ?: throw ReviewNotFoundException(isbn, reviewId)
@@ -133,11 +139,21 @@ class BookstoreService(
         }
     }
 
+    fun getReview(isbn: String, reviewId: Long): Review {
+        ensureBookExists(isbn)
+        return reviewsByBook[isbn]?.get(reviewId) ?: throw ReviewNotFoundException(isbn, reviewId)
+    }
+
     private fun ensureBookExists(isbn: String) {
         if (!books.containsKey(isbn)) {
             throw BookNotFoundException(isbn)
         }
     }
+
+    private fun currentUsername(): String =
+        SecurityContextHolder.getContext().authentication?.name
+            ?.takeUnless { it.isBlank() }
+            ?: "anonymous"
 
     private fun validate(any: Any) {
         val violations = validator.validate(any)

@@ -2,15 +2,22 @@
 @isbn = 9780134685991
 @missingIsbn = 0000000000000
 @reviewId = 1
+@apiToken = token-catalog-abc123
+@editor1Basic = Basic ZWRpdG9yMTplZGl0b3IxcGFzcw==
+@editor2Basic = Basic ZWRpdG9yMjplZGl0b3IycGFzcw==
+@adminBasic = Basic YWRtaW46YWRtaW5wYXNz
 
 ### US1 - list books (empty or populated)
 GET {{host}}/books
 Accept: application/json
+X-Api-Token: {{apiToken}}
 
 ### US2 - create book (success)
 POST {{host}}/books
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "isbn": "{{isbn}}",
@@ -24,6 +31,8 @@ Accept: application/json
 POST {{host}}/books
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "isbn": "{{isbn}}",
@@ -37,6 +46,8 @@ Accept: application/json
 POST {{host}}/books
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "isbn": "",
@@ -50,18 +61,23 @@ Accept: application/json
 GET {{host}}/books/{{isbn}}
 Accept: application/json
 Accept-Language: en
+X-Api-Token: {{apiToken}}
 
 ### US3 - get single book (not found, Portuguese)
 GET {{host}}/books/{{missingIsbn}}
 Accept: application/json
 Accept-Language: pt
+X-Api-Token: {{apiToken}}
 
 ### US4 - replace book (upsert create)
 PUT {{host}}/books/9780321356680
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
+  "isbn": "9780321356680",
   "title": "Effective C++",
   "author": "Scott Meyers",
   "price": 39.90,
@@ -72,8 +88,11 @@ Accept: application/json
 PUT {{host}}/books/{{isbn}}
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
+  "isbn": "{{isbn}}",
   "title": "Effective Java, 3rd Edition",
   "author": "Joshua Bloch",
   "price": 54.99,
@@ -84,6 +103,8 @@ Accept: application/json
 PATCH {{host}}/books/{{isbn}}
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "price": 44.99,
@@ -94,6 +115,8 @@ Accept: application/json
 PATCH {{host}}/books/{{missingIsbn}}
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "title": "Ghost Book"
@@ -102,19 +125,25 @@ Accept: application/json
 ### US6 - delete book (not found)
 DELETE {{host}}/books/{{missingIsbn}}
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{adminBasic}}
 
 ### US7 - list reviews for a book (empty)
 GET {{host}}/books/{{isbn}}/reviews
 Accept: application/json
+X-Api-Token: {{apiToken}}
 
 ### US7 - list reviews for a missing book
 GET {{host}}/books/{{missingIsbn}}/reviews
 Accept: application/json
+X-Api-Token: {{apiToken}}
 
 ### US8 - create review (success)
 POST {{host}}/books/{{isbn}}/reviews
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "rating": 5,
@@ -125,6 +154,8 @@ Accept: application/json
 POST {{host}}/books/{{isbn}}/reviews
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "rating": 7,
@@ -135,6 +166,8 @@ Accept: application/json
 POST {{host}}/books/{{missingIsbn}}/reviews
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "rating": 4,
@@ -145,6 +178,8 @@ Accept: application/json
 PUT {{host}}/books/{{isbn}}/reviews/{{reviewId}}
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "rating": 4,
@@ -155,6 +190,8 @@ Accept: application/json
 PUT {{host}}/books/{{isbn}}/reviews/999
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "rating": 3,
@@ -165,6 +202,8 @@ Accept: application/json
 PATCH {{host}}/books/{{isbn}}/reviews/{{reviewId}}
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "comment": "Updated only the comment."
@@ -174,6 +213,8 @@ Accept: application/json
 PATCH {{host}}/books/{{isbn}}/reviews/{{reviewId}}
 Content-Type: application/json
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 {
   "rating": 0
@@ -182,11 +223,17 @@ Accept: application/json
 ### US11 - delete review (success)
 DELETE {{host}}/books/{{isbn}}/reviews/{{reviewId}}
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{editor1Basic}}
 
 ### US11 - delete review (review not found)
 DELETE {{host}}/books/{{isbn}}/reviews/{{reviewId}}
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{adminBasic}}
 
 ### US6 - delete book (success, should also delete all reviews)
 DELETE {{host}}/books/{{isbn}}
 Accept: application/json
+X-Api-Token: {{apiToken}}
+Authorization: {{adminBasic}}

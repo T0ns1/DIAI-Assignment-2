@@ -16,6 +16,9 @@ data class ReviewResponse(
 
     @field:Schema(description = "Optional review comment", example = "Excellent reference book.")
     val comment: String?,
+
+    @field:Schema(description = "Username of the review author", example = "editor1")
+    val author: String,
 )
 
 @Schema(description = "Payload to create a review")

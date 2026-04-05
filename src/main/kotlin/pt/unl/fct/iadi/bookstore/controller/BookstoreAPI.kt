@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.MediaType
@@ -35,6 +36,7 @@ import pt.unl.fct.iadi.bookstore.controller.dto.UpdateReviewRequest
     name = "Bookstore",
     description = "Book and review management API",
 )
+@SecurityRequirement(name = "apiToken")
 @RequestMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
 interface BookstoreAPI {
 
@@ -90,6 +92,7 @@ interface BookstoreAPI {
         "/books",
         consumes = [MediaType.APPLICATION_JSON_VALUE],
     )
+    @SecurityRequirement(name = "basicAuth")
     fun createBook(
         @RequestBody(
             description = "Book to create",
@@ -185,6 +188,7 @@ interface BookstoreAPI {
         "/books/{isbn}",
         consumes = [MediaType.APPLICATION_JSON_VALUE],
     )
+    @SecurityRequirement(name = "basicAuth")
     fun replaceBook(
         @Parameter(
             description = "ISBN of the book",
@@ -245,6 +249,7 @@ interface BookstoreAPI {
         "/books/{isbn}",
         consumes = [MediaType.APPLICATION_JSON_VALUE],
     )
+    @SecurityRequirement(name = "basicAuth")
     fun updateBook(
         @Parameter(
             description = "ISBN of the book",
@@ -288,6 +293,7 @@ interface BookstoreAPI {
         ],
     )
     @DeleteMapping("/books/{isbn}")
+    @SecurityRequirement(name = "basicAuth")
     fun deleteBook(
         @Parameter(
             description = "ISBN of the book",
@@ -374,6 +380,7 @@ interface BookstoreAPI {
         "/books/{isbn}/reviews",
         consumes = [MediaType.APPLICATION_JSON_VALUE],
     )
+    @SecurityRequirement(name = "basicAuth")
     fun createReview(
         @Parameter(
             description = "ISBN of the book",
@@ -434,6 +441,7 @@ interface BookstoreAPI {
         "/books/{isbn}/reviews/{reviewId}",
         consumes = [MediaType.APPLICATION_JSON_VALUE],
     )
+    @SecurityRequirement(name = "basicAuth")
     fun replaceReview(
         @Parameter(
             description = "ISBN of the book",
@@ -500,6 +508,7 @@ interface BookstoreAPI {
         "/books/{isbn}/reviews/{reviewId}",
         consumes = [MediaType.APPLICATION_JSON_VALUE],
     )
+    @SecurityRequirement(name = "basicAuth")
     fun updateReview(
         @Parameter(
             description = "ISBN of the book",
@@ -549,6 +558,7 @@ interface BookstoreAPI {
         ],
     )
     @DeleteMapping("/books/{isbn}/reviews/{reviewId}")
+    @SecurityRequirement(name = "basicAuth")
     fun deleteReview(
         @Parameter(
             description = "ISBN of the book",

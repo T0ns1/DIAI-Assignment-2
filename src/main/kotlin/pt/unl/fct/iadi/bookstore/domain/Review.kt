@@ -13,4 +13,6 @@ data class Review(
 
     @field:Size(max = 500)
     val comment: String?,
+
+    val author: String,
 )

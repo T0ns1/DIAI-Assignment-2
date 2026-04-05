@@ -128,5 +128,6 @@ class BookstoreController(
         id = id,
         rating = rating,
         comment = comment,
+        author = author,
     )
 }
